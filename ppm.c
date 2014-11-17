@@ -28,6 +28,17 @@ void ppm_shrink(u_char** image, int *width, int *height, int factor);
 
 
 
+//============================================================================
+//                                  Structures
+//============================================================================
+struct image
+{
+    u_char* image;
+    int width;
+    int height;
+    u_char* data;
+};
+
 
 //============================================================================
 //                                  Main
@@ -37,11 +48,20 @@ int main(int argc, char* argv[])
   //--------------------------------------------------------------------------
   // Read file "gargouille.ppm" into image (width and height)
   //--------------------------------------------------------------------------
+  
+  /* Old version to define an image:
   u_char* image = NULL;
   int width;
   int height;
+  */
+
+  // New version with the struct image:
+  struct image newimage;
+  newimage.image=NULL;
+  newimage.data=(u_char*)malloc(3*newimage.width*newimage.height*sizeof(*newimage.data));
+    
   
-  ppm_read_from_file(&width, &height, &image);
+  ppm_read_from_file(&newimage.width, &newimage.height, &newimage.image);
   
 
 
@@ -50,33 +70,29 @@ int main(int argc, char* argv[])
   // write it into "gargouille_BW.ppm"
   //--------------------------------------------------------------------------
   // Copy image into image_bw
-  int width_bw  = width;
-  int height_bw = height;
-  u_char* image_bw = (u_char*) malloc(3 * width * height * sizeof(*image_bw));
-  memcpy(image_bw, image, 3 * width * height * sizeof(*image_bw));
+  int width_bw  = newimage.width;
+  int height_bw = newimage.height;
+  u_char* image_bw = newimage.data;
+  memcpy(image_bw, newimage.image, 3 * newimage.width * newimage.height * sizeof(*image_bw));
 
   // Desaturate image_bw
-  ppm_desaturate(image_bw, width, height);
+  ppm_desaturate(image_bw, newimage.width, newimage.height);
 
   // Write the desaturated image into "gargouille_BW.ppm"
   FILE* ppm_output;
   char * fileBW = "gargouille_BW.ppm";
-  ppm_write_to_file(width, height, image_bw, ppm_output, fileBW);
+  ppm_write_to_file(newimage.width, newimage.height, image_bw, ppm_output, fileBW);
   
-
-  // Free the desaturated image
-  free(image_bw);
-
 
   //--------------------------------------------------------------------------
   // Create a resized copy of the image and
   // write it into "gargouille_small.ppm"
   //--------------------------------------------------------------------------
   // Copy image into image_small
-  int width_small  = width;
-  int height_small = height;
-  u_char* image_small = (u_char*) malloc(3 * width_small * height_small * sizeof(*image_small));
-  memcpy(image_small, image, 3 * width_small * height_small * sizeof(*image_small));
+  int width_small  = newimage.width;
+  int height_small = newimage.height;
+  u_char* image_small = newimage.data;
+  memcpy(image_small, newimage.image, 3 * width_small * height_small * sizeof(*image_small));
 
   // Shrink image_small size 2-fold
   ppm_shrink(&image_small, &width_small, &height_small, 2);
@@ -88,9 +104,8 @@ int main(int argc, char* argv[])
   
 
   // Free the not yet freed images
-  free(image);
+  free(newimage.image);
   free(image_small);
-
   return 0;
 }
 
