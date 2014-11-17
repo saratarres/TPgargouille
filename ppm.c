@@ -36,7 +36,6 @@ struct image
     u_char* image;
     int width;
     int height;
-    u_char* data;
 };
 
 
@@ -58,7 +57,6 @@ int main(int argc, char* argv[])
   // New version with the struct image:
   struct image newimage;
   newimage.image=NULL;
-  newimage.data=(u_char*)malloc(3*newimage.width*newimage.height*sizeof(*newimage.data));
     
   
   ppm_read_from_file(&newimage.width, &newimage.height, &newimage.image);
@@ -72,7 +70,7 @@ int main(int argc, char* argv[])
   // Copy image into image_bw
   int width_bw  = newimage.width;
   int height_bw = newimage.height;
-  u_char* image_bw = newimage.data;
+  u_char* image_bw = (u_char*)malloc(3*newimage.width*newimage.height*sizeof(*image_bw));
   memcpy(image_bw, newimage.image, 3 * newimage.width * newimage.height * sizeof(*image_bw));
 
   // Desaturate image_bw
@@ -82,6 +80,8 @@ int main(int argc, char* argv[])
   FILE* ppm_output;
   char * fileBW = "gargouille_BW.ppm";
   ppm_write_to_file(newimage.width, newimage.height, image_bw, ppm_output, fileBW);
+    
+  free(image_bw);
   
 
   //--------------------------------------------------------------------------
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   // Copy image into image_small
   int width_small  = newimage.width;
   int height_small = newimage.height;
-  u_char* image_small = newimage.data;
+  u_char* image_small = (u_char*)malloc(3*newimage.width*newimage.height*sizeof(*image_small));
   memcpy(image_small, newimage.image, 3 * width_small * height_small * sizeof(*image_small));
 
   // Shrink image_small size 2-fold
