@@ -1,11 +1,17 @@
 
+
+
+
+
+#include <sys/types.h> //to know the u_char type in a mac
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <sys/types.h> //to know the u_char type in a mac
 #include "image_processing.h"
+
+
 
 
 //============================================================================
